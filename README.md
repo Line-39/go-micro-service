@@ -61,3 +61,14 @@ Switch to the next chapter [Hello]() of the introduction:
 ```Bash
 git switch 01-hello
 ```
+
+## Installation
+If not yet installed, follow the [official guide](https://go.dev/doc/install) to install Go on your system.
+
+Verify the installation:
+```Bash
+go version
+# go version go1.22.1 linux/amd64
+```
+
+You are ready to Go!
