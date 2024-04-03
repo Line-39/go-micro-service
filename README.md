@@ -84,7 +84,7 @@ You are ready to Go!
 ## First programm
 
 ### Prerequests
-If you are working with clonned project, switch to the next branch (`01-first-programm`):
+If you are working with clonned project, switch to the next branch (`02-first-programm`):
 ```Bash
-git switch 01-first-programm
+git switch 02-first-programm
 ```
