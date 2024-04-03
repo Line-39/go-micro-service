@@ -63,6 +63,14 @@ git switch 01-installation
 ```
 
 ## Installation
+
+### Prerequests
+If you are working with clonned project, switch to the next branch (`01-installation`):
+```Bash
+git switch 01-installation
+```
+
+### Instructions
 If not yet installed, follow the [official guide](https://go.dev/doc/install) to install Go on your system.
 
 Verify the installation:
@@ -72,3 +80,11 @@ go version
 ```
 
 You are ready to Go!
+
+## First programm
+
+### Prerequests
+If you are working with clonned project, switch to the next branch (`01-first-programm`):
+```Bash
+git switch 01-first-programm
+```
