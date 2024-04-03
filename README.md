@@ -56,10 +56,10 @@ git switch -b 00-setup
 Create and / or edit your `LICENSE` and `.gitignore` files accordingly.
 
 ### Next chapter
-Switch to the next chapter [Hello]() of the introduction:
+Switch to the next chapter [Installation](#installation) of the introduction:
 
 ```Bash
-git switch 01-hello
+git switch 01-installation
 ```
 
 ## Installation
