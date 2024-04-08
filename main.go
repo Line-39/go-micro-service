@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -10,11 +11,35 @@ func hello(w http.ResponseWriter, r *http.Request) {
 }
 
 func viewData(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Display user data 📁\n"))
+	user := r.PathValue("user")
+	if user == "" {
+		http.NotFound(w, r)
+		return
+	}
+	dtype := r.PathValue("datatype")
+	if dtype == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	msg := fmt.Sprintf("📁 Display the %s data for user %s\n", dtype, user)
+	w.Write([]byte(msg))
+
 }
 
 func uploadData(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Upload user data 📤\n"))
+	user := r.PathValue("user")
+	if user == "" {
+		http.NotFound(w, r)
+		return
+	}
+	dtype := r.PathValue("datatype")
+	if dtype == "" {
+		http.NotFound(w, r)
+		return
+	}
+	msg := fmt.Sprintf("📤 Upload the %s data for user %s\n", dtype, user)
+	w.Write([]byte(msg))
 }
 
 func main() {
@@ -23,7 +48,7 @@ func main() {
 
 	// register handlers
 	mux.HandleFunc("/{$}", hello)
-	mux.HandleFunc("/data/view", viewData)
+	mux.HandleFunc("/{user}/data/{datatype}/view", viewData)
 	mux.HandleFunc("/data/upload", uploadData)
 
 	// log the service startup

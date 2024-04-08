@@ -476,3 +476,84 @@ mux.HandleFunc("/{$}", hello)
 
 Now restart the service, and navigate to [localhost:4000/foo](localhost:4000/foo) again, you should receive `404 page not found` response.
 
+---
+
+### WIldcard patterns
+The `net/http` `servemux` lets us to us whildcards in path patterns. Lets consider following scenario for our service:
+
+1. All the data served based on specified user ID;
+2. There are two types of data: *raw* data and *clean* data;
+
+Lets change our `data/view` and `data/upload` routes:
+
+```Go
+// ...
+	mux.HandleFunc("/{user}/data/{datatype}/view", viewData)
+	mux.HandleFunc("/{user}/data/{datatype}/upload", uploadData)
+// ...
+```
+On the next slide, we modify our handler (shown for `view`) to use the wildcards.
+
+---
+
+### Wildcard patterns (continued)
+
+```Go
+func viewData(w http.ResponseWriter, r *http.Request) {
+    user := r.PathValue("user")
+    if user == "" {
+        http.NotFound(w, r)
+        return
+    }
+    dtype := r.PathValue("datatype")
+        if user == "" {
+        http.NotFound(w, r)
+        return
+    }
+
+    msg := fmt.Sprintf("📁 Display the %s data for user %s\n", dtype, user)
+	w.Write([]byte(msg))
+
+}
+```
+
+---
+
+### Wildcard patterns (continued)
+Now we can restart our service. Let say we want to see **raw** data for the user **ubot**:
+
+```Bash
+curl -i localhost:4000/ubot/data/raw/view
+#HTTP/1.1 200 OK
+#Date: Mon, 08 Apr 2024 14:42:04 GMT
+#Content-Length: 40
+#Content-Type: text/plain; charset=utf-8
+#
+#📁 Display the raw data for user ubot
+```
+
+Keep in mind, that user can send any kind of parameter as a wildcard. So checking the validity is entirely on you.
+
+--- 
+
+### Wildcard patterns (continued)
+Let's try another request
+
+```Bash
+curl -i localhost:4000/jer/data/jobs/view
+#HTTP/1.1 200 OK
+#Date: Mon, 08 Apr 2024 14:44:53 GMT
+#Content-Length: 40
+#Content-Type: text/plain; charset=utf-8
+#
+#📁 Display the jobs data for user jer
+```
+
+---
+
+### Wildcard patterns (continued)
+Be aware that patterns defined with *wildcard* might overlap. E.g. `user/view` and `user/{data}` requests overlap (incoming `user/view` request is a valid match for `user/{data}` pattern). 
+
+In such cases `servemux` applies following precedence rule: *The most specific pattern wins*. 
+
+Since `user/view` matches only *one specific* request, and `user/{data}` matches infinit amount of possible requests `user/view` will take precedent.
