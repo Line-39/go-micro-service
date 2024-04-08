@@ -380,15 +380,16 @@ curl http://localhost:4000/
 ---
 
 ### Adding more endpoints
-Switch to the new branch `04-first-api` by running `git switch 04-first-api` if you are working on clonned project, or modify yor `main.go` as shown below.
+Switch to the new branch `04-first-api` by running `git switch 04-first-api` if you are working on clonned project, or modify yor `main.go` as shown on the next slide.
+
+---
+
+### Adding new handlers
+
+First, define new handlers (definitions go before `main()` definition):
 
 ```Go
-package main
-
-import (
-	"log"
-	"net/http"
-)
+// ...
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hi there 👋"))
@@ -401,7 +402,15 @@ func viewData(w http.ResponseWriter, r *http.Request) {
 func uploadData(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Upload user data 📤"))
 }
+```
 
+---
+
+### Registering new handlers
+
+Second register your new handlers:
+
+```Go
 func main() {
 	// create a new servermux
 	mux := http.NewServeMux()
@@ -411,51 +420,52 @@ func main() {
 	mux.HandleFunc("/data/view", viewData)
 	mux.HandleFunc("/data/upload", uploadData)
 
-	// log the service startup
-	log.Print("starting service on :4000")
-
-	// start http server on :4000
-	err := http.ListenAndServe(":4000", mux)
-	// log the error message if ListenAndServe() encounters error
-	log.Fatal(err)
+	// ... the rest of the code
 }
 ```
 
 ---
 
 #### Run the service
-To start the service locally, run following command from the terminal:
+Now, run the service locally, executing following command in your terminal.
 
 ```Bash
 go run .
+# 1970/01/01 00:00:00 starting service on :4000
 ```
+
+You are ready to query the API
 
 ---
 
-### Query the API: In the browser 
+### Query the API (browser)
 While service is running, open your browser and type the following addresses to see the response from the service:
-- [localhost:4000/hello](localhost:4000/hellow) our `hello` endpoint;
+- [localhost:4000/](localhost:4000/hellow) our `hello` endpoint;
 - [localhost:4000/data/view](localhost:4000/data/view) our `viewData` endpoint;
 - [localhost:4000/data/upload](localhost:4000/data/upload) our `uploadData` endpoint;
 
 ---
 
-### Query the API: curl
+### Query the API (CLI)
 
-Type following commands to see the response from the endpoints we just created:
+Type following commands to see the response from the endpoints we just created.
+
+```Bash
+curl -i localhost:4000/
+curl -i localhost:4000/data/view
+curl -i localhost:4000/data/upload
+```
 
 ---
 
 ### Restricting subtree path
-Every path that deos not end with the trailing slash will be matched *exectly* by the router. In contrast to that, any path with *trailing slash* is considered to be a *subtree path pattern*. In the case of *subtree path pattern* it matches for any path matching subtree pattern.
+Every path that deos not end with the trailing slash will be matched *exectly* by the router. However, any path with *trailing slash* is considered to be a *subtree path pattern*, and it matches for any path matching subtree pattern.
 
-Run the service with `go run .`, and navigate to [localhost:4000/foo](localhost:4000/foo). This endpoint does not exist in our `servermux` definition. But server responds with greetings. It happens because our `hello` handler is mapped to the [localhost:4000/](localhost:4000) path, ending with trailing slash, which brings it into *subtree path pattern* category. So anything partially matching [localhost:4000/](localhost:4000) will call `hello()` handler, sending the response to the user. In other words, trailing slash can be red as `/**` i.e. wildcard pattern.
+Run the service with `go run .`, and navigate to [localhost:4000/foo](localhost:4000/foo). This endpoint does not exist in our `servermux` definition. But server responds with greetings, it is because *subtree path pattern* match. I.e [localhost:4000/](localhost:4000) will call `hello()` handler, sending the response to the user. In other words, trailing slash can be red as `/**` i.e. wildcard pattern.
 
 ---
 
-### Instructions
-
-
+### Restricting subtree path
 To *restrict subtree pattern matching* we can add a *special character* `{$}` to the end of the path, after the trailing slah. Modify your router definition as shown below and restart the server:
 
 ```Go
@@ -464,4 +474,5 @@ mux.HandleFunc("/{$}", hello)
 // ...
 ```
 
-Now try to navigate to [localhost:4000/foo](localhost:4000/foo) again, and service will respond with `404 page not found` status code.
+Now restart the service, and navigate to [localhost:4000/foo](localhost:4000/foo) again, you should receive `404 page not found` response.
+
