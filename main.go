@@ -47,9 +47,9 @@ func main() {
 	mux := http.NewServeMux()
 
 	// register handlers
-	mux.HandleFunc("/{$}", hello)
-	mux.HandleFunc("/{user}/data/{datatype}/view", viewData)
-	mux.HandleFunc("/data/upload", uploadData)
+	mux.HandleFunc("GET /{$}", hello)
+	mux.HandleFunc("GET /{user}/data/{datatype}", viewData)
+	mux.HandleFunc("POST /{user}/data/{datatype}", uploadData)
 
 	// log the service startup
 	log.Print("starting service on :4000")

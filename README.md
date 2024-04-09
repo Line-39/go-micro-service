@@ -557,3 +557,60 @@ Be aware that patterns defined with *wildcard* might overlap. E.g. `user/view` a
 In such cases `servemux` applies following precedence rule: *The most specific pattern wins*. 
 
 Since `user/view` matches only *one specific* request, and `user/{data}` matches infinit amount of possible requests `user/view` will take precedent.
+
+---
+
+### HTTP methods
+We can introduce constraints, so our API responts *only* to the HTTP requests with *appropriate HTTP method*. To achive this we will edit the rout regisration in `main.go`:
+
+```Go
+// ...
+	// register handlers
+	mux.HandleFunc("GET /{$}", hello)
+	mux.HandleFunc("GET /{user}/data/{datatype}/view", viewData)
+	mux.HandleFunc("POST /{user}/data/{datatype}/upload", uploadData)
+// ...
+```
+
+Now save your changes and restart the service to request API.
+
+---
+
+### HTTP methods (continued)
+From CLI try following querries
+
+```Bash
+curl -i localhost:4000/                             # 200 
+curl -i -X POST localhost:4000/ubot/data/raw/view   # 405 Method Not Allowed
+curl -i -X GET  localhost:4000/ubot/data/raw/view   # 200
+curl -i -X GET  localhost:4000/ubot/data/raw/upload # 405 Method Not Allowed
+curl -i -X POST localhost:4000/ubot/data/raw/upload # 200
+```
+All the requests with unappropriate HTTP methods were rejected.
+
+--- 
+
+### HTTP methods (continued)
+Using HTTP methods, we can simplify the pattern of our endpoints, getting rid of the last `view / upload` part, since it will be defined by the HTTP method we use.
+
+```Go
+// ...
+	// register handlers
+	mux.HandleFunc("GET /{$}", hello)
+	mux.HandleFunc("GET /{user}/data/{datatype}", viewData)
+	mux.HandleFunc("POST /{user}/data/{datatype}", uploadData)
+// ...
+```
+
+---
+
+### HTTP methods (continued)
+Modifying our request, we can see that the same endpoint is now responds differently depending on the HTTP method we are using.
+
+```Bash
+curl -X GET localhost:4000/jer/data/raw
+# 📁 Display the raw data for user jer
+
+curl -X POST localhost:4000/jer/data/raw
+# 📤 Upload the raw data for user jer
+```
