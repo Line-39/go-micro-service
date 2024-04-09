@@ -614,3 +614,84 @@ curl -X GET localhost:4000/jer/data/raw
 curl -X POST localhost:4000/jer/data/raw
 # 📤 Upload the raw data for user jer
 ```
+
+--- 
+
+### HTTP status codes
+First time the `w.Write()` has been called it wrights `200 OK` to the response *header*. Write `201 Created` status code to the header, as shown below: 
+
+```Go
+package main
+
+// ...
+func uploadData(w http.ResponseWriter, r *http.Request) {
+    // ...
+    w.WriteHeader(http.statusCreated)
+    msg := fmt.Sprintf("📤 Upload the %s data for user %s\n", dtype, user)
+    w.Write([]byte(msg))
+}
+```
+
+---
+
+### Http status codes (continued)
+Onece writen, header's status code *can not be changed*. So the status code has to be modified *before* any subsequent `w.Write()` call. For example, the code below returns warning, and status code remains to be `200 OK`:
+
+```Go
+func someHandler(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.statusProcessing)
+
+    if ok := true; ok {
+        w.WriteHeader(http.statusAccepted)
+    }
+    w.Write([]byte("Hell yeah!"))
+}
+```
+
+---
+
+### HTTP status codes (continued)
+Run you service, and call `<user>/data/<datatype>` endpoint using `POST` request:
+
+```Bash
+go run .
+# 1970/01/01 00:00:00 starting service on :4000
+# another terminal window
+curl -Xi POST localhost:4000/jer/data/raw
+#HTTP/1.1 201 Created
+#Date: Thu, 01 Jan 1970 00:00:00 GMT
+#Content-Length: 38
+#Content-Type: text/plain; charset=utf-8
+#
+#📤 Upload the raw data for user jer
+```
+
+---
+
+### Modifying header map
+We can modify header with `Header()`, `Add()`, `Set()`, `Del()`, `Get()`, `Values()` methods. For example, overwrite *content-type of the response, add the information about our server (key) name (value) for `/` handler:
+
+```Go
+func hello(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Server", "Simple Go Service")
+	w.Write([]byte(`{"message":"Hi there 👋"}`))
+}
+```
+
+---
+
+### Modifying header map (continued)
+Restart the service and call `/` endpoint:
+
+```Bash
+go run .
+curl -i localhost:4000/
+#HTTP/1.1 200 OK
+#Content-Type: application/json
+#Server: Simple Go Service
+#Date: Thu, 01 Jan 1970 00:00:00 GMT
+#Content-Length: 29
+#
+#{"message":"Hi there 👋\n"}
+```

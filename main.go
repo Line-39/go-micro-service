@@ -7,7 +7,9 @@ import (
 )
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hi there 👋\n"))
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Server", "Simple Go Service")
+	w.Write([]byte(`{"message":"Hi there 👋"}`))
 }
 
 func viewData(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +40,11 @@ func uploadData(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
+
 	msg := fmt.Sprintf("📤 Upload the %s data for user %s\n", dtype, user)
+
 	w.Write([]byte(msg))
 }
 
