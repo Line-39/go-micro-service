@@ -137,7 +137,7 @@ In the project directory, create a `main.go` function and open it in your online
 
 ```Bash
 touch main.go
-# vim main.go   # if you ran this command - unplag you PC and reboot
+# vim main.go   # if you ran this command - burn your pc - your only path to freedom
 code main.go
 ```
 
@@ -152,7 +152,7 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Hello, world 🪄🪄🪄")
+    fmt.Println("Hello, world 🪄🪄🪄")
 }
 ```
 
@@ -392,15 +392,15 @@ First, define new handlers (definitions go before `main()` definition):
 // ...
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hi there 👋"))
+    w.Write([]byte("Hi there 👋"))
 }
 
 func viewData(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Display user data 📁"))
+    w.Write([]byte("Display user data 📁"))
 }
 
 func uploadData(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Upload user data 📤"))
+    w.Write([]byte("Upload user data 📤"))
 }
 ```
 
@@ -412,15 +412,15 @@ Second register your new handlers:
 
 ```Go
 func main() {
-	// create a new servermux
-	mux := http.NewServeMux()
-
-	// register handlers
-	mux.HandleFunc("/", hello)
-	mux.HandleFunc("/data/view", viewData)
-	mux.HandleFunc("/data/upload", uploadData)
-
-	// ... the rest of the code
+    // create a new servermux
+    mux := http.NewServeMux()
+    
+    // register handlers
+    mux.HandleFunc("/", hello)
+    mux.HandleFunc("/data/view", viewData)
+    mux.HandleFunc("/data/upload", uploadData)
+    
+    // ... the rest of the code
 }
 ```
 
@@ -488,8 +488,8 @@ Lets change our `data/view` and `data/upload` routes:
 
 ```Go
 // ...
-	mux.HandleFunc("/{user}/data/{datatype}/view", viewData)
-	mux.HandleFunc("/{user}/data/{datatype}/upload", uploadData)
+mux.HandleFunc("/{user}/data/{datatype}/view", viewData)
+mux.HandleFunc("/{user}/data/{datatype}/upload", uploadData)
 // ...
 ```
 On the next slide, we modify our handler (shown for `view`) to use the wildcards.
@@ -512,7 +512,7 @@ func viewData(w http.ResponseWriter, r *http.Request) {
     }
 
     msg := fmt.Sprintf("📁 Display the %s data for user %s\n", dtype, user)
-	w.Write([]byte(msg))
+    w.Write([]byte(msg))
 
 }
 ```
@@ -565,10 +565,10 @@ We can introduce constraints, so our API responts *only* to the HTTP requests wi
 
 ```Go
 // ...
-	// register handlers
-	mux.HandleFunc("GET /{$}", hello)
-	mux.HandleFunc("GET /{user}/data/{datatype}/view", viewData)
-	mux.HandleFunc("POST /{user}/data/{datatype}/upload", uploadData)
+// register handlers
+mux.HandleFunc("GET /{$}", hello)
+mux.HandleFunc("GET /{user}/data/{datatype}/view", viewData)
+mux.HandleFunc("POST /{user}/data/{datatype}/upload", uploadData)
 // ...
 ```
 
@@ -595,10 +595,10 @@ Using HTTP methods, we can simplify the pattern of our endpoints, getting rid of
 
 ```Go
 // ...
-	// register handlers
-	mux.HandleFunc("GET /{$}", hello)
-	mux.HandleFunc("GET /{user}/data/{datatype}", viewData)
-	mux.HandleFunc("POST /{user}/data/{datatype}", uploadData)
+// register handlers
+mux.HandleFunc("GET /{$}", hello)
+mux.HandleFunc("GET /{user}/data/{datatype}", viewData)
+mux.HandleFunc("POST /{user}/data/{datatype}", uploadData)
 // ...
 ```
 
@@ -673,9 +673,9 @@ We can modify header with `Header()`, `Add()`, `Set()`, `Del()`, `Get()`, `Value
 
 ```Go
 func hello(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Add("Server", "Simple Go Service")
-	w.Write([]byte(`{"message":"Hi there 👋"}`))
+    w.Header().Set("Content-Type", "application/json")
+    w.Header().Add("Server", "Simple Go Service")
+    w.Write([]byte(`{"message":"Hi there 👋"}`))
 }
 ```
 
