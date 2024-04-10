@@ -879,3 +879,33 @@ Run the service, and pass the environmental variables as a flag values
 go run . -name="${NAME}" -version="${VERS}"
 # 1970/01/01 00:00:01 starting Simple Go Microservice 🚀, version 0.0.2 on :4000
 ```
+
+--- 
+
+### Makefile
+There is a lot of typing already. Instead of sourcing the `.env` and passing the variables to `go run .`, and `go build .` we will write this once into the make file. Create `Makefile` in the root of the project:
+
+```Bash
+touch Makefile
+code Makefile
+```
+
+---
+
+### Makefile (continued)
+Edit it as follows. 
+
+```Makefile
+#!make
+include .env
+export
+
+config:
+	@echo -e 'Current config:\n-Name:\t\t${NAME}\n-Version:\t${VERS}\n-Address:\t${ADDR}\n'
+
+run:
+	@go run . -addr=${ADDR} -name=${NAME} -version=${VERS}
+
+build:
+	@go build
+```
