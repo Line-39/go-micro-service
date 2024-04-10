@@ -846,3 +846,36 @@ go run . -help
 ```
 ---
 
+### Environmental variables
+In some scenarios we would need to use environmental variables for our application. For example, environmental variables can be usefull for our service configuration. Let's create a `.env` file and save our `addr`, `name` and `version` there:
+
+```Bash
+ADDR=":4000"
+NAME="Simple Go Microservice 🚀"
+VERS="0.0.2"
+```
+
+---
+
+### Environmental variables (continued)
+Load the variables to the Bash environment, and access their values:
+
+```Bash
+source .env
+echo $ADDR
+# :4000
+echo $NAME
+# Simple Go Microservice 🚀
+echo $VERS
+# 0.0.2
+```
+
+---
+
+### Environmental variables (continued)
+Run the service, and pass the environmental variables as a flag values
+
+```Bash
+go run . -name="${NAME}" -version="${VERS}"
+# 1970/01/01 00:00:01 starting Simple Go Microservice 🚀, version 0.0.2 on :4000
+```
