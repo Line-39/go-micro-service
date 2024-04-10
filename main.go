@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -49,6 +50,12 @@ func uploadData(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// access command-line flags
+	addr := flag.String("addr", ":4000", "HTTP network address")
+	name := flag.String("name", "Simbple Go Microservice", "Service name")
+	version := flag.String("version", "0.0.0", "Service version")
+
+	flag.Parse()
 	// create a new servermux
 	mux := http.NewServeMux()
 
@@ -58,10 +65,10 @@ func main() {
 	mux.HandleFunc("POST /{user}/data/{datatype}", uploadData)
 
 	// log the service startup
-	log.Print("starting service on :4000")
+	log.Printf("starting %s, version %s on %s", *name, *version, *addr)
 
 	// start http server on :4000
-	err := http.ListenAndServe(":4000", mux)
+	err := http.ListenAndServe(*addr, mux)
 	// log the error message if ListenAndServe() encounters error
 	log.Fatal(err)
 }

@@ -695,3 +695,88 @@ curl -i localhost:4000/
 #
 #{"message":"Hi there 👋\n"}
 ```
+
+---
+
+### Configuration settings: CLI arguments
+Our service listens to the network address wich is hardcoded in `main()`. This is OK for early builds, but not a good way to configure the application.
+
+```Go
+// log the service startup
+log.Print("starting service on :4000")
+
+// start http server on :4000
+err := http.ListenAndServe(":4000", mux)
+```
+The good idea is to make such things as network-address, name and version of the application, secrets  etc configurable at runtime.
+
+---
+
+### Configuration settings: CLI arguments (continued)
+We can pass command-line arguments when starting the application:
+
+```Bash
+go run . -addr=":4000" -name="Simple Go Microservice" -version="0.0.1"
+```
+
+We can access CLI arguments with `flag` package `String` function:
+
+```Go
+func main() {
+    // ...
+    addr    := flag.String("addr", ":4000", "HTTP network address")
+    name    := flag.String("name", "Simple Go Microservice", "The name of the app")
+    version := flag.String("version", "0.0.0", "The version of the app")
+    flag.Parse()
+    // ...
+}
+```
+
+---
+
+### Configuration settings: CLI arguments (continued)
+It is important to understand that first we *define* our variables `addr`, `name` and `version` as new vars of *CLI flag type*. When latter we call `flag.Parse()` it parses CLI arguments and passes the values to this variables:
+
+```Go
+func main() {
+    //...
+    // log on startup
+    log.Printf("Starting %s, version %s on %s", *addr, *name, *version)
+
+    // start http server on :4000
+    err := http.ListenAndServe(*addr, mux)
+    //...
+}
+```
+
+---
+
+### Configuration settings: CLI arguments (continued)
+Modify `main()` and run the service without *any* command-line flags:
+
+```Bash
+go run .
+# 1970/01/01 00:00:01 starting Simbple Go Microservice, version 0.0.0 on :4000
+```
+Run the service with some flags:
+
+```Bash
+go run . -addr="5000" -name="Einfacher Go-Service"
+# 1970/01/01 00:00:01 starting Einfacher Go-Service, version Infinity on :5000
+```
+
+---
+
+### Configuration settings: CLI arguments (continued)
+The help for command-line arguments is automatically created for us:
+
+```Bash
+go run . -help
+# Usage of /tmp/go-build2113936530/b001/exe/go-microservice:
+#   -addr string
+#         HTTP network address (default ":4000")
+#   -name string
+#         Service name (default "Simple Go Microservice")
+#   -version string
+#         Service version (default "0.0.0")
+```
