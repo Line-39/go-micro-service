@@ -1022,3 +1022,104 @@ make config
 make run
 # 1970/01/01 00:00:00 starting Simple Go Microservice 🚀, version 0.0.3 on :4000
 ```
+
+Try to change the name of the service in `.env` file, and restart the service to see what happens.
+
+---
+
+### Logger
+
+Go *standard library* includes the `log/slog` package to create a *structured* log entries in a set format. The created log entry includes:
+- A timestamp;
+- The severity level (`Debug`, `Info`, `Warn`, `Error`);
+- The log message (`string`);
+- Optional number of key-value pairs for additional information;
+
+
+---
+
+### Logger (continued)
+We create a `slog` instance with `slog.New()` function, which takes a *structured log handler* as it's argument. 
+
+```Go
+logHandler := slog.NewTextHandler(os.StdOut, nil)
+logger := slog.New(loggerHandler)
+```
+
+Or, as a oneliner
+
+```Go
+logger := slog.New(slog.NewTextHandler(os.StdOut, nil))
+```
+We create the logger to log into standard output, whith the handler with no customized options.
+
+---
+
+### Logger (continued)
+Lets implement it in our application. First, in `main.go` `main()` body create an instance of `slog`:
+
+```Go
+logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+```
+
+Then update all the calls of `log`:
+
+```Go
+	// log the service startup
+	logger.Info(fmt.Sprintf("Starting service %s v:%s  on %s", cfg.name, cfg.version, cfg.addr))
+
+	// start http server on :4000
+	err := http.ListenAndServe(cfg.addr, mux)
+	// log the error message if ListenAndServe() encounters error
+	logger.Error(err.Error())
+	os.Exit(1)
+```
+---
+
+### Logger (continued)
+Now run the service, and see the log message.
+
+```Bash
+go run .
+# time=1970-01-01T00:00:03.044+02:00 level=INFO msg="Starting service Simple Go Microservice 🚀 v:0.0.3  on :4000"
+```
+
+Initiate an error message executing `go run .` from another terminal:
+
+```Bash
+go run .
+# ime=1970-01-01T00:00:03.044+02:00 level=INFO msg="Starting service  v:  on "
+# ime=1970-01-01T00:00:03.044+02:00 level=ERROR msg="listen tcp :80: bind: permission denied"
+# exit status 1
+```
+---
+
+### Logger (continued)
+The same way we did before we can log in *JSON* format. Change the logger definition, as shown below:
+
+```Go
+logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+```
+
+And restart the service:
+```Bash
+go run .
+# {"time":"2024-04-10T23:36:59.319554283+02:00","level":"INFO","msg":"Starting service Simple Go Microservice 🚀 v:0.0.3  on :4000"}
+```
+
+---
+
+### Logger (continued)
+If we would like to redirect the log output to the file, we can specify the densination in *slog handler* definition. However, we can make it agnostic about the final destination. For example, calling `go run . >> log` we will append the logs to the `log` file for the latter processing.
+
+```Bash
+go run . >> log
+# in another terminal
+cat log
+# {"time":"2024-04-10T23:42:09.643528183+02:00","level":"INFO","msg":"Starting service Simple Go Microservice 🚀 v:0.0.3  on :4000"}
+```
+
+### Logger (continued)
+Loggers created by `slog.New()` are concurrency-safe: a single logger can be used accross multiple goroutines ignorring the race conditions.
+
+---

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 )
@@ -105,6 +105,9 @@ func main() {
 	// init config
 	cfg.init()
 
+	// init logger
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 	// create a new servermux
 	mux := http.NewServeMux()
 
@@ -115,10 +118,11 @@ func main() {
 	mux.HandleFunc("POST /{user}/data/{datatype}", uploadData)
 
 	// log the service startup
-	log.Printf("starting %s, version %s on %s", cfg.name, cfg.version, cfg.addr)
+	logger.Info(fmt.Sprintf("Starting service %s v:%s  on %s", cfg.name, cfg.version, cfg.addr))
 
 	// start http server on :4000
 	err := http.ListenAndServe(cfg.addr, mux)
 	// log the error message if ListenAndServe() encounters error
-	log.Fatal(err)
+	logger.Error(err.Error())
+	os.Exit(1)
 }
