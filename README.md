@@ -761,8 +761,72 @@ go run .
 Run the service with some flags:
 
 ```Bash
-go run . -addr="5000" -name="Einfacher Go-Service"
+go run . -addr="5000" -name="Einfacher Go-Service" -version="Infinity"
 # 1970/01/01 00:00:01 starting Einfacher Go-Service, version Infinity on :5000
+```
+
+---
+
+### Configuration settings: CLI arguments (continued)
+In several secanarios we would like to store the values received through the command line flags, in a single structure and access it during the run. Let's define a `config` structure in our `main.go`
+
+```Go
+type config struct {
+    addr string
+    name string
+    version string
+}
+```
+
+---
+
+### Configuration settings: CLI arguments (continued)
+We can access CLI arguments with `flag` package `StringVar` function, and pass their values into predefined `config`:
+
+```Go
+func main() {
+    // ...
+    var cfg config
+    
+    flag.StringVar(&cfg.addr, "addr", ":4000", "HTTP network address")
+    flag.String(&cfg.name, "name", "Simple Go Microservice", "The name of the app")
+    flag.String(&cfg.version, "version", "0.0.0", "The version of the app")
+    flag.Parse()
+    // ...
+}
+```
+
+---
+
+### Configuration settings: CLI arguments (continued)
+It is important to understand that first we *define* our variables `addr`, `name` and `version` as new vars of *CLI flag type*. When latter we call `flag.Parse()` it parses CLI arguments and passes the values to this variables:
+
+```Go
+func main() {
+    //...
+    // log on startup
+    log.Printf("Starting %s, version %s on %s", cfg.name, cfg.version, cfg.addr)
+
+    // start http server on :4000
+    err := http.ListenAndServe(cfg.addr, mux)
+    //...
+}
+```
+
+---
+
+### Configuration settings: CLI arguments (continued)
+Modify `main()` and run the service without *any* command-line flags:
+
+```Bash
+go run .
+# 1970/01/01 00:00:01 starting Simple Go Microservice, version 0.0.0 on :4000
+```
+Run the service with some flags:
+
+```Bash
+go run . -name="Rocinante 🚀"
+# 1970/01/01 00:00:01 starting Rocinante 🚀, version 0.0.0 on :4000
 ```
 
 ---
@@ -780,3 +844,5 @@ go run . -help
 #   -version string
 #         Service version (default "0.0.0")
 ```
+---
+
