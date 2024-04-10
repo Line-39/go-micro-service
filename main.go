@@ -1,18 +1,38 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 )
 
 // config model
 type config struct {
-	addr    string
-	name    string
-	version string
+	addr    string `default:":4000"`
+	name    string `default:"Simple Go Microservice 🚀"`
+	version string `default:"0.0.1"`
+}
+
+// methods
+func (cnf *config) init() {
+	var addr, name, vers string
+
+	addr = os.Getenv("ADDR")
+	if addr != "" {
+		cnf.addr = addr
+	}
+
+	name = os.Getenv("NAME")
+	if name != "" {
+		cnf.name = name
+	}
+
+	vers = os.Getenv("VERS")
+	if vers != "" {
+		cnf.version = vers
+	}
 }
 
 // handler
@@ -81,12 +101,10 @@ func uploadData(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// declare config
 	var cfg config
-	// access command-line flags
-	flag.StringVar(&cfg.addr, "addr", ":4000", "HTTP network address")
-	flag.StringVar(&cfg.name, "name", "Simbple Go Microservice", "Service name")
-	flag.StringVar(&cfg.version, "version", "0.0.0", "Service version")
 
-	flag.Parse()
+	// init config
+	cfg.init()
+
 	// create a new servermux
 	mux := http.NewServeMux()
 

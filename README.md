@@ -908,4 +908,117 @@ run:
 
 build:
 	@go build
+
+all:
+	@$(MAKE) build
+	@./go-microservice -addr=${ADDR} -name=${NAME} -version=${VERS}
+```
+
+---
+
+### Makefile (continued)
+Save the changes and run following commands:
+
+```Bash
+make config
+# Current config:
+# -Name:          "Simple Go Microservice 🚀"
+# -Version:       "0.0.2"
+# -Address:       ":4000"
+make run
+# 1970/01/01 00:00:00 starting Simple Go Microservice 🚀, version 0.0.2 on :4000
+make all
+# make[1]: Entering directory '/home/ubot/go/src/github.com/line-39/go-micro-service'
+# make[1]: Leaving directory '/home/ubot/go/src/github.com/line-39/go-micro-service'
+# 1970/01/01 00:00:00 starting Simple Go Microservice 🚀, version 0.0.2 on :4000
+```
+
+---
+
+### Accessing environment at run
+There are scenarios, when we want to access environmental variables not when we start the application, but at runtime. Let's modify our code to do so. First we are going to modify the code for our `config` declaration:
+
+```Go
+// config model
+type config struct {
+    addr    string `default:":4000"`
+    name    string `default:"Simple Go Microservice 🚀"`
+    version string `0.0.1`
+}
+```
+
+---
+
+### Accessing environment at run (continued)
+Next, we define method on `config` type:
+
+```Go
+
+func (cnf *config) init() {
+    addr := os.Getenv("ADDR")
+    if addr != "" { cnf.addr = addr }
+
+    name := os.Getenv("NAME")
+    if name != "" { cnf.name = name }
+
+    vers := os.Getenv("VERS")
+    if vers != "" { cnf.version = vers }
+}
+
+```
+
+---
+
+### Accessing environment at run (continued)
+Next, remove everything related to command-line flags parsing, and replace it with the following code:
+
+```Go
+
+func (cnf *config) init() {
+    //...
+    // declare config
+    var cfg config
+    
+    // init config
+    cfg.init()
+    //...
+}
+
+```
+
+### Accessing environment at run (continued)
+Modify your `Makefile`:
+
+```Makefile
+#!make
+include .env
+export
+
+config:
+	@echo -e 'Current config:\n-Name:\t\t${NAME}\n-Version:\t${VERS}\n-Address:\t${ADDR}\n'
+
+run:
+	@go run .
+
+build:
+	@go build
+
+all:
+	@$(MAKE) build
+	@./go-microservice
+```
+
+---
+
+### Accessing environment at run (continued)
+And restart your service.
+
+```Bash
+make config
+#Current config:
+#-Name:          "Simple Go Microservice 🚀"
+#-Version:       "0.0.3"
+#-Address:       ":4000"
+make run
+# 1970/01/01 00:00:00 starting Simple Go Microservice 🚀, version 0.0.3 on :4000
 ```
