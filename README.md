@@ -1125,3 +1125,49 @@ cat log
 ### Logger (continued)
 Loggers created by `slog.New()` are concurrency-safe: a single logger can be used accross multiple goroutines ignorring the race conditions.
 
+---
+
+### Dependency injection
+Wouldn't it be nice if we could use the same instance of our `logger` everywhere in our service, including our handler functions? This is where we need a *dependency injections*.
+
+Let's update our code. First create a `app` embeding the `logger` and `config`:
+
+```Go
+// application model
+type application struct {
+	config *config
+	logger *slog.Logger
+}
+```
+
+---
+
+### Dependency injection (continued)
+We convert our handler functions to be a *methods* against our `app`.
+
+```Go
+// handler
+func (app *application) hello(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    w.Header().Add("Server", "Simple Go Service")
+    
+    app.logger.Info("endpoint: 'hello'", "method", r.Method, "uri", r.URL.RequestURI())
+
+    w.Write([]byte(`{"message":"Hi there 👋"}`))
+}
+```
+
+---
+
+### Dependency injection (continued)
+We have to initialize our `app` in `main`: 
+
+```Go
+// init logger
+logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+// init applicatio
+app := &application{
+    logger: logger,
+}
+```

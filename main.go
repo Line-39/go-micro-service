@@ -35,10 +35,17 @@ func (cnf *config) init() {
 	}
 }
 
+// application model
+type application struct {
+	logger *slog.Logger
+}
+
 // handler
-func hello(w http.ResponseWriter, r *http.Request) {
+func (app *application) hello(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Add("Server", "Simple Go Service")
+
+	app.logger.Info("endpoint: 'hello'", "method", r.Method, "uri", r.URL.RequestURI())
 	w.Write([]byte(`{"message":"Hi there 👋"}`))
 }
 
@@ -106,13 +113,18 @@ func main() {
 	cfg.init()
 
 	// init logger
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+	// init applicatio
+	app := &application{
+		logger: logger,
+	}
 
 	// create a new servermux
 	mux := http.NewServeMux()
 
 	// register handlers
-	mux.HandleFunc("GET /{$}", hello)
+	mux.HandleFunc("GET /{$}", app.hello)
 	mux.HandleFunc("GET /help", help)
 	mux.HandleFunc("GET /{user}/data/{datatype}", viewData)
 	mux.HandleFunc("POST /{user}/data/{datatype}", uploadData)
@@ -121,7 +133,7 @@ func main() {
 	logger.Info(fmt.Sprintf("Starting service %s v:%s  on %s", cfg.name, cfg.version, cfg.addr))
 
 	// start http server on :4000
-	err := http.ListenAndServe(cfg.addr, mux)
+	err := http.ListenAndServe(":4000", mux)
 	// log the error message if ListenAndServe() encounters error
 	logger.Error(err.Error())
 	os.Exit(1)
