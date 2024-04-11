@@ -1118,8 +1118,7 @@ go run . >> log
 cat log
 # {"time":"2024-04-10T23:42:09.643528183+02:00","level":"INFO","msg":"Starting service Simple Go Microservice 🚀 v:0.0.3  on :4000"}
 ```
+---
 
 ### Logger (continued)
 Loggers created by `slog.New()` are concurrency-safe: a single logger can be used accross multiple goroutines ignorring the race conditions.
-
----
