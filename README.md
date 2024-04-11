@@ -1171,3 +1171,30 @@ app := &application{
     logger: logger,
 }
 ```
+
+---
+
+### Dependency injection (continued)
+And change our routs accordingly
+
+```Go
+// create a new servermux
+mux := http.NewServeMux()
+
+// register handlers
+mux.HandleFunc("GET /{$}", app.hello)
+//mux.HandleFunc("GET /{user}/data/{datatype}", app.viewData)
+//mux.HandleFunc("POST /{user}/data/{datatype}", app.uploadData)
+```
+
+---
+
+### Dependency injection (continued)
+Now if we run our service, and hit `/` endpoint, we will see logs printed by `hello` handler function:
+
+```Bash
+go run .
+# another terminal
+curl localhost:4000/
+# time=2024-04-11T14:13:52.284+02:00 level=INFO msg="Request received" method=GET uri=/
+```
